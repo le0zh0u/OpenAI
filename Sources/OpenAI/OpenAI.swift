@@ -206,8 +206,12 @@ extension OpenAI {
         if host.contains("/") {
             prefixPath = host.split(separator: "/").dropFirst().joined(separator: "/")
             host = String(host.split(separator: "/").first!)
-            if prefixPath.suffix(1) == "/" {
+            if prefixPath.hasSuffix("/") {
                 prefixPath = String(prefixPath.dropLast())
+            } 
+
+            if !prefixPath.hasPrefix("/") {
+                prefixPath = "/" + prefixPath
             }
         }
 
