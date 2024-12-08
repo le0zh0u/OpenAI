@@ -199,10 +199,21 @@ extension OpenAI {
     
     func buildURL(path: String) -> URL {
         var components = URLComponents()
+
+        var host = configuration.host
+        var prefixPath = ""
+        if host.contains("/") {
+            host = host.split(separator: "/").first!
+            prefixPath = host.split(separator: "/").dropFirst().joined(separator: "/")
+            if prefixPath.suffix(1) == "/" {
+                prefixPath = String(prefixPath.dropLast())
+            }
+        }
+
         components.scheme = configuration.scheme
-        components.host = configuration.host
+        components.host = host
         components.port = configuration.port
-        components.path = path
+        components.path = prefixPath + path
         return components.url!
     }
 }
