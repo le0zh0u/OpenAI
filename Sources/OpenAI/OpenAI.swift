@@ -203,7 +203,7 @@ extension OpenAI {
         var host = configuration.host
         var prefixPath = ""
         if host.contains("/") {
-            host = host.split(separator: "/").first!
+            host = String(host.split(separator: "/").first!)
             prefixPath = host.split(separator: "/").dropFirst().joined(separator: "/")
             if prefixPath.suffix(1) == "/" {
                 prefixPath = String(prefixPath.dropLast())
