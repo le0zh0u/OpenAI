@@ -136,6 +136,7 @@ extension OpenAI {
                 guard let data = data else {
                     return completion(.failure(OpenAIError.emptyData))
                 }
+                print(data)
                 let decoder = JSONDecoder()
                 do {
                     completion(.success(try decoder.decode(ResultType.self, from: data)))
@@ -155,19 +156,25 @@ extension OpenAI {
                                             organizationIdentifier: configuration.organizationIdentifier,
                                             timeoutInterval: configuration.timeoutInterval)
             let session = StreamingSession<ResultType>(urlRequest: request)
+            print("2-1")
             session.onReceiveContent = {_, object in
+                print("2-2")
                 onResult(.success(object))
             }
             session.onProcessingError = {_, error in
+                print("2-3")
                 onResult(.failure(error))
             }
             session.onComplete = { [weak self] object, error in
+                print("2-4")
+                print(object)
                 self?.streamingSessions.removeAll(where: { $0 == object })
                 completion?(error)
             }
             session.perform()
             streamingSessions.append(session)
         } catch {
+            print("2-5")
             completion?(error)
         }
     }
