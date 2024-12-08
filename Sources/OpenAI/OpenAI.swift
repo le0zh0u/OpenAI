@@ -136,7 +136,14 @@ extension OpenAI {
                 guard let data = data else {
                     return completion(.failure(OpenAIError.emptyData))
                 }
-                print(data)
+                
+                // Print received data as string if possible
+                if let dataString = String(data: data, encoding: .utf8) {
+                    print("Received data: \(dataString)")
+                } else {
+                    print("Received data (raw): \(data)")
+                }
+                
                 let decoder = JSONDecoder()
                 do {
                     completion(.success(try decoder.decode(ResultType.self, from: data)))
