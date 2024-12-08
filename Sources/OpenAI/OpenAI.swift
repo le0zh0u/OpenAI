@@ -129,21 +129,12 @@ extension OpenAI {
             let request = try request.build(token: configuration.token, 
                                             organizationIdentifier: configuration.organizationIdentifier,
                                             timeoutInterval: configuration.timeoutInterval)
-            print(request.url)
-            print(request.httpBody)
             let task = session.dataTask(with: request) { data, _, error in
                 if let error = error {
                     return completion(.failure(error))
                 }
                 guard let data = data else {
                     return completion(.failure(OpenAIError.emptyData))
-                }
-                
-                // Print received data as string if possible
-                if let dataString = String(data: data, encoding: .utf8) {
-                    print("Received data: \(dataString)")
-                } else {
-                    print("Received data (raw): \(data)")
                 }
                 
                 let decoder = JSONDecoder()
@@ -165,25 +156,19 @@ extension OpenAI {
                                             organizationIdentifier: configuration.organizationIdentifier,
                                             timeoutInterval: configuration.timeoutInterval)
             let session = StreamingSession<ResultType>(urlRequest: request)
-            print("2-1")
             session.onReceiveContent = {_, object in
-                print("2-2")
                 onResult(.success(object))
             }
             session.onProcessingError = {_, error in
-                print("2-3")
                 onResult(.failure(error))
             }
             session.onComplete = { [weak self] object, error in
-                print("2-4")
-                print(object)
                 self?.streamingSessions.removeAll(where: { $0 == object })
                 completion?(error)
             }
             session.perform()
             streamingSessions.append(session)
         } catch {
-            print("2-5")
             completion?(error)
         }
     }
@@ -219,8 +204,8 @@ extension OpenAI {
         var host = configuration.host
         var prefixPath = ""
         if host.contains("/") {
-            host = String(host.split(separator: "/").first!)
             prefixPath = host.split(separator: "/").dropFirst().joined(separator: "/")
+            host = String(host.split(separator: "/").first!)
             if prefixPath.suffix(1) == "/" {
                 prefixPath = String(prefixPath.dropLast())
             }
